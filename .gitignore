@@ -1,0 +1,11 @@
+target
+.classpath
+.project
+/.settings/
+/logs/
+.idea/
+ProiectCercetare.iml
+*/*.iml
+*.iml
+*.prefs
+GoogleNews-vectors-negative300.bin.gz
