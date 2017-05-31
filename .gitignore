@@ -9,3 +9,4 @@ ProiectCercetare.iml
 *.iml
 *.prefs
 GoogleNews-vectors-negative300.bin.gz
+*-out.txt
