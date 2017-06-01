@@ -22,41 +22,38 @@ import java.util.List;
 
 /**
  * Created by sroboiu on 30-May-17.
+ * <p>
+ * OutputȘ
+ * Document 'health' falls into the following categories:
+ * health: 0.29721372296220205
+ * science: 0.011684473733853906
+ * finance: -0.14755302887323793
+ * <p>
+ * Document 'finance' falls into the following categories:
+ * health: -0.17290237675941766
+ * science: -0.09579267574606627
+ * finance: 0.4460859189453788
  */
+
 public class ParagraphVectorsClassifier {
+
+    private static final Logger log = LoggerFactory.getLogger(ParagraphVectorsClassifier.class);
 
     ParagraphVectors paragraphVectors;
     LabelAwareIterator iterator;
     TokenizerFactory tokenizerFactory;
-
-    private static final Logger log = LoggerFactory.getLogger(ParagraphVectorsClassifier.class);
 
     public static void main(String[] args) throws Exception {
 
         ParagraphVectorsClassifier app = new ParagraphVectorsClassifier();
         app.makeParagraphVectors();
         app.checkUnlabeledData();
-        /*
-                Your output should be like this:
-
-                Document 'health' falls into the following categories:
-                    health: 0.29721372296220205
-                    science: 0.011684473733853906
-                    finance: -0.14755302887323793
-
-                Document 'finance' falls into the following categories:
-                    health: -0.17290237675941766
-                    science: -0.09579267574606627
-                    finance: 0.4460859189453788
-
-                    so,now we know categories for yet unseen documents
-         */
     }
 
-    void makeParagraphVectors()  throws Exception {
+    void makeParagraphVectors() throws Exception {
         ClassPathResource resource = new ClassPathResource("paravec/labeled");
 
-        // build a iterator for our dataset
+        // build a iterator for our data set
         iterator = new FileLabelAwareIterator.Builder()
                 .addSourceFolder(resource.getFile())
                 .build();
@@ -80,23 +77,23 @@ public class ParagraphVectorsClassifier {
     }
 
     void checkUnlabeledData() throws FileNotFoundException {
-      /*
-      At this point we assume that we have model built and we can check
-      which categories our unlabeled document falls into.
-      So we'll start loading our unlabeled documents and checking them
-     */
+        /*
+        At this point we assume that we have model built and we can check
+        which categories our unlabeled document falls into.
+        So we'll start loading our unlabeled documents and checking them
+        */
         ClassPathResource unClassifiedResource = new ClassPathResource("paravec/unlabeled");
         FileLabelAwareIterator unClassifiedIterator = new FileLabelAwareIterator.Builder()
                 .addSourceFolder(unClassifiedResource.getFile())
                 .build();
 
-     /*
-      Now we'll iterate over unlabeled data, and check which label it could be assigned to
-      Please note: for many domains it's normal to have 1 document fall into few labels at once,
-      with different "weight" for each.
-     */
+        /*
+        Now we'll iterate over unlabeled data, and check which label it could be assigned to
+        Please note: for many domains it's normal to have 1 document fall into few labels at once,
+        with different "weight" for each.
+        */
         MeansBuilder meansBuilder = new MeansBuilder(
-                (InMemoryLookupTable<VocabWord>)paragraphVectors.getLookupTable(),
+                (InMemoryLookupTable<VocabWord>) paragraphVectors.getLookupTable(),
                 tokenizerFactory);
         LabelSeeker seeker = new LabelSeeker(iterator.getLabelsSource().getLabels(),
                 (InMemoryLookupTable<VocabWord>) paragraphVectors.getLookupTable());
@@ -106,14 +103,14 @@ public class ParagraphVectorsClassifier {
             INDArray documentAsCentroid = meansBuilder.documentAsVector(document);
             List<Pair<String, Double>> scores = seeker.getScores(documentAsCentroid);
 
-         /*
-          please note, document.getLabel() is used just to show which document we're looking at now,
-          as a substitute for printing out the whole document name.
-          So, labels on these two documents are used like titles,
-          just to visualize our classification done properly
-         */
-            log.info("Document '" + document.getLabel() + "' falls into the following categories: ");
-            for (Pair<String, Double> score: scores) {
+            /*
+            document.getLabel() is used just to show which document we're looking at now,
+            as a substitute for printing out the whole document name.
+            So, labels on these two documents are used like titles,
+            just to visualize our classification done properly
+            */
+            log.info("Document from '" + document.getLabel() + "' folder falls into the following categories: ");
+            for (Pair<String, Double> score : scores) {
                 log.info("        " + score.getFirst() + ": " + score.getSecond());
             }
         }
